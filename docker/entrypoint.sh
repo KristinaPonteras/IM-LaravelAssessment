@@ -15,6 +15,11 @@ if [ "$APP_ENV" != "production" ]; then
         echo "[entrypoint] Generating APP_KEY..."
         php artisan key:generate --force || true
     fi
+
+    if [ -f .env ] && grep -q '^APP_KEY=base64:' .env; then
+        APP_KEY="$(grep '^APP_KEY=' .env | tail -n 1 | cut -d= -f2-)"
+        export APP_KEY
+    fi
 fi
 
 # --- Database migrations (db is already healthy via depends_on) -------------
@@ -31,7 +36,9 @@ else
     php artisan optimize:clear || true
 fi
 
-php artisan storage:link || true
+if [ ! -e public/storage ]; then
+    php artisan storage:link || true
+fi
 
 echo "[entrypoint] Starting: $*"
 exec "$@"

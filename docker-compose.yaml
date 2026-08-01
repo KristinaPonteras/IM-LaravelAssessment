@@ -8,6 +8,16 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "php -r '$$socket = @fsockopen(\"127.0.0.1\", 9000); exit($$socket ? 0 : 1);'",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
     networks:
       - laravel-test
 
@@ -19,7 +29,8 @@ services:
     image: laravel-api-web
     restart: unless-stopped
     depends_on:
-      - app
+      app:
+        condition: service_healthy
     networks:
       - laravel-test
 
