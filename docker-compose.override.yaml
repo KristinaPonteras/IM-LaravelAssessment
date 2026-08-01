@@ -4,7 +4,6 @@ services:
   app:
     build:
       target: development
-    user: "${UID}:${GID}"
     env_file:
       - .env
     volumes:
