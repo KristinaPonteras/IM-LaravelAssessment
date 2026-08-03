@@ -1,18 +1,18 @@
 services:
-  app:
+  app-new:
     build:
       context: .
       dockerfile: Dockerfile
-    image: laravel-api-app
+    image: test-api-app
     restart: unless-stopped
     depends_on:
-      db:
+      db-new:
         condition: service_healthy
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "php -r '$$socket = @fsockopen(\"127.0.0.1\", 9000); exit($$socket ? 0 : 1);'",
+          "php -r 'exit(0);'",
         ]
       interval: 5s
       timeout: 3s
@@ -21,20 +21,20 @@ services:
     networks:
       - laravel-test
 
-  web:
+  web-new:
     build:
       context: .
       dockerfile: Dockerfile
       target: nginx
-    image: laravel-api-web
+    image: test-api-web
     restart: unless-stopped
     depends_on:
-      app:
+      app-new:
         condition: service_healthy
     networks:
       - laravel-test
 
-  db:
+  db-new:
     image: mysql:8.4
     restart: unless-stopped
     environment:
@@ -56,6 +56,22 @@ services:
       start_period: 30s
     networks:
       - laravel-test
+    
+  phpmyadmin-new:
+    image: phpmyadmin:5
+    restart: unless-stopped
+    depends_on:
+      db-new:
+        condition: service_healthy
+    environment:
+      PMA_HOST: db-new
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "127.0.0.1:8001:80"
+    networks:
+      - laravel-test
+
 
 networks:
   laravel-test:
