@@ -2,6 +2,9 @@
 set -e
 
 cd /var/www/html
+# Ensure Git writes its global config to a writable location (the working directory) and mark the directory as safe
+export HOME=/var/www/html
+git config --global --add safe.directory /var/www/html
 
 # --- Development only: bind-mounted volume may be missing dependencies -------
 if [ "$APP_ENV" != "production" ]; then
