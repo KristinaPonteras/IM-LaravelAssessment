@@ -31,16 +31,19 @@ class StudentController extends Controller
         return StudentResource::collection($students);
     }
 
+
     public function store(StoreStudentRequest $request)
     {
         $student = $this->studentService->createStudent(
             $request->validated()
         );
 
-        return (new StudentResource($student))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
+        return response()->json([
+            'message' => 'Created successfully.',
+            'data' => new StudentResource($student),
+        ], Response::HTTP_CREATED);
     }
+
 
     public function show(string $id)
     {
